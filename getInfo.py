@@ -11,7 +11,8 @@ def getHtml(url):#爬取html
     html=r.read()
     return html
 
-def getData(html):#从html中提出账号、密码等信息
+def getData():#从html中提出账号、密码等信息
+    html=getHtml('https://www.ssegou.com/page/testss.html')
     soup=BeautifulSoup(html,"html.parser")
    #获取ＩＰ和加密方式
     info_tag0=soup.select('div[class="testvpnitem"]')[0]
@@ -37,12 +38,10 @@ def getData(html):#从html中提出账号、密码等信息
                "method":encrypt_str1,"fast_open":'true',"workers":5}
     return data_dic0,data_dic1
 
+
 def makejson(pathname):#将提取的信息做成json文档然后存储到制定路径
-    html=getHtml('https://www.ssegou.com/page/testss.html')
-    data_dic0,data_dic1=getData(html)
+    data_dic0,data_dic1=getData()
     file=pathname+'/dtplayer.json'
     fp=open(file,'w')
     fp.write(json.dumps(data_dic0))
     fp.close()
-    
-#makejson("/home/young")
