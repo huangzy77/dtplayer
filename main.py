@@ -1,44 +1,62 @@
 # -*- coding:utf-8 -*- 
 import os
 import getInfo
-from threading import Timer
+import time
+from multiprocessing import Process, Queue
 from operator import or_
 
-
+#开两个线程，一个监视网络是否连接，一个用于重启sslocal
 
 
 def isConnected(ip_str):#判断获取的ＩＰ是否还有效果
-    output=os.popen("ping -c 1 -w 2 %s" % (ip_str)).read().split("\n")
-    if "1 packets transmitted, 1 received, 0% packet loss, time 0ms" in output:
-        return 1
-    else:
-        return 0
+    counter=0
+    temp=0
+    while True:
+        output=os.popen("ping -c 1 -w 2 %s" % (ip_str)).read().split("\n")
+        if "1 packets transmitted, 1 received, 0% packet loss, time 0ms" in output:
+            values=1
+        else:
+            values=0
+        time.sleep(2)
+        counter+=1
+        temp=temp+values
+        if counter>=5:
+            print temp
+            if temp<=1:
+                restart_server()#连续４次ping不通，就重启服务
+            counter=0
+            temp=0
 
-def run_server(): 
-    '''
-    if processinfo("sslocal")==0:
-        getInfo.makejson(json_path)
-        os.system("sslocal -c "+json_path+"/dtplayer.json") 
-    else:
-        os.system("command")
-        getInfo.makejson(json_path)
-        os.system("sslocal -c "+json_path+"/dtplayer.json") 
-        '''
-    flag_num=0#记录第几次运行
-    data_dic0,data_dic1=getInfo.getData()
-    ip_str=data_dic0["server"]
-    json_path=os.getcwd() #确定shadow.json目录
-    while (isConnected(ip_str)==0 or flag_num==0) :
+
+def start_server():
+        os.popen("sslocal -c "+json_path+"/dtplayer.json")
+
+def restart_server(): 
         os.system("pkill sslocal")
         getInfo.makejson(json_path)
-        os.system("sslocal -c "+json_path+"/dtplayer.json")
-        flag_num+=1
+        start_server()
 
-    
+
+
+ #确定shadow.json目录
+
   
 if __name__ == "__main__":
     try:
-        run_server()  
+        data_dic0,data_dic1=getInfo.getData()
+        ip_str=data_dic0["server"]
+        json_path=os.getcwd()
+        
+        p_isConnected=Process(target=isConnected,args=(ip_str,))
+        p_isConnected.start()
+        start_server()
+        p_isConnected.join()
+
+        
+        
+            
+           
+                
     except Exception,e:  
         print Exception,":",e
        
