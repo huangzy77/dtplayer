@@ -1,14 +1,36 @@
 # -*- coding:utf-8 -*- 
+#from selenium import webdriver
 import urllib2
 import json 
 from bs4 import BeautifulSoup
+from bs4.builder import HTML
 
 def getHtml(url):#爬取html
-    req=urllib2.Request(url)
-    req.add_header('Referer', 'https://www.ssegou.com')
-    req.add_header('User-Agent',"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
-    r=urllib2.urlopen(req)
-    html=r.read()
+    '''
+    try:
+        driver = webdriver.Chrome()
+        driver.get('https://www.ssegou.com/page/testss.html')
+        driver.refresh()
+        html=driver.page_source
+    except:
+        driver = webdriver.Chrome()
+        driver.get('https://www.ssegou.com/page/testss.html')
+        driver.refresh()
+        html=driver.page_source
+    return html
+    '''
+    try:
+        req=urllib2.Request(url)
+        req.add_header('Referer', 'https://www.ssegou.com')
+        req.add_header('User-Agent',"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
+        r=urllib2.urlopen(req)
+        html=r.read()
+    except:
+        req=urllib2.Request(url)
+        req.add_header('Referer', 'https://www.ssegou.com')
+        req.add_header('User-Agent',"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
+        r=urllib2.urlopen(req)
+        html=r.read()
     return html
 
 def getData():#从html中提出账号、密码等信息
@@ -43,5 +65,8 @@ def makejson(pathname):#将提取的信息做成json文档然后存储到制定�
     data_dic0,data_dic1=getData()
     file=pathname+'/dtplayer.json'
     fp=open(file,'w')
-    fp.write(json.dumps(data_dic0))
+    fp.write(json.dumps(data_dic1))
     fp.close()
+    
+data_dic0,data_dic1=getData()
+print data_dic1

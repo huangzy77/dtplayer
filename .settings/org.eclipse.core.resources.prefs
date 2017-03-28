@@ -1,3 +1,5 @@
 eclipse.preferences.version=1
 encoding/getInfo.py=utf-8
 encoding/main.py=utf-8
+encoding/multithread_test.py=utf-8
+encoding/selenium_test.py=utf-8
