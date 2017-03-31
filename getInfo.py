@@ -68,5 +68,5 @@ def makejson(pathname):#将提取的信息做成json文档然后存储到制定�
     fp.write(json.dumps(data_dic1))
     fp.close()
     
-data_dic0,data_dic1=getData()
-print data_dic1
+#data_dic0,data_dic1=getData()
+#print data_dic1
