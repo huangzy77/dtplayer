@@ -12,21 +12,22 @@ def isConnected(pipe):#一个监视网络密码端口是否更改
     data_dic0_st,data_dic1_st=getInfo.getData()
     count=0
     while True:
-        count+=1
-        data_dic0,data_dic1=getInfo.getData()
-        print count
-        sleep(1)
-        if (data_dic0==data_dic0_st and data_dic1==data_dic1_st):
-            print("系统检测正常,传递值０:")
-            pipe.send(0)
-            count=0
-        if count>=20:
-            print("更新密码、端口中...")
-            os.popen("pkill sslocal")
-            pipe.send(1)
-            count=0
-
-        
+        try:
+            count+=1
+            data_dic0,data_dic1=getInfo.getData()
+            print count
+            sleep(1)
+            if (data_dic0==data_dic0_st and data_dic1==data_dic1_st):
+                print("系统检测正常,传递值０:")
+                pipe.send(0)
+                count=0
+            if count>=20:
+                print("更新密码、端口中...")
+                os.popen("pkill sslocal")
+                pipe.send(1)
+                count=0
+        except Exception,e:  
+            print Exception,":",e
 
 
 def start_server(pipe):
