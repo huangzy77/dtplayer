@@ -1,81 +1,75 @@
 # -*- coding:utf-8 -*- 
 import os
 import getInfo
-
+import time
+from multiprocessing import Process,Queue
+import subprocess
 from time import sleep
 import requests
 
 
-#开两个线程，一个监视网络密码端口是否更改，一个用于重启sslocal
-
-
-def isConnected(pipe):#一个监视网络密码端口是否更改
+def is_connected(q):
+    print "is p {}".format(os.getppid())
+    print "is {}".format(os.getpid())
     count=0
     while True:
         count+=1
         try:
             print("The {} times test!".format(count))
-            resp = requests.get('http://google.com', proxies=dict(http='socks5://localhost@1080',https='socks5://localhost@1080'))
+            resp = requests.get('http://www.google.com', proxies=dict(http='socks5://localhost:1080',https='socks5://localhost:1080'),timeout=10)
             if(resp.status_code==200):
                 print("Everything is oK!")
-                pipe.send(0)
+                q.put(1)
+                sleep(20)
             else:
                 print("Something wrong! Status Code is {}".format(resp.status_code))
-                pipe.send(1)
-        except:
+                q.put(0)
+                sleep(20)
+        except Exception,e:  
+            #print Exception,":",e
             print('Something wrong! Restart!')
-            pipe.send(1)
-                    
-            
+            q.put(0)
+            sleep(20)
 
-    '''
-    data_dic0_st,data_dic1_st=getInfo.getData()
-    count=0
-    while True:
-        count+=1
-        data_dic0,data_dic1=getInfo.getData()
-        print count
-        sleep(1)
-        if (data_dic0==data_dic0_st and data_dic1==data_dic1_st):
-            print("系统检测正常,传递值０:")
-            pipe.send(0)
-            count=0
-        if count>=50:
-            print("更新密码、端口中...")
-            os.popen("killall sslocal")
-            pipe.send(1)
-            count=0
-    '''
-    
-            
-    
-
-
-def start_server(pipe):
-    json_path=os.getcwd()
-    getInfo.makejson(json_path)
-    print("执行")
+def ss_start(q):
+    print "ss p {}".format(os.getppid())
+    print "ss {}".format(os.getpid())
     try:
-        os.popen("sslocal -c "+json_path+"/dtplayer.json")
+        json_path=os.getcwd()
+        getInfo.makejson(json_path)
+        #print("执行{}".format(os.getpid()))
+        obj=subprocess.Popen("sslocal -c "+json_path+"/dtplayer.json",stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
+        print('ss is Run!objpid {}'.format(obj.pid))
         '''
-        while True: #监听另外一个进程传来的消息
-            if(pipe.recv()==1):
-                print("重启啦...")
-                start_server(pipe)
-            '''
-    except Exception,e:  
-        print Exception,":",e
+        lines=obj.stdout.readlines()       
+        if not lines or len(lines)==0:
+            lines=obj.stderr.readlines()
+        '''
+
         
-
-
+        #print lines
+        while True:#监听is子进程传来的消息，０为需要重启ss进程，１为正常          
+            value=q.get(True)
+            print value
+            if value==0:
+                obj.kill()
+                ss_start(q)
+    except Exception,e:
+        print('ss is wrong!')  
+        print Exception,":",e
 
 
 if __name__ == "__main__":
-    json_path=os.getcwd()
-    getInfo.makejson(json_path)
-    print("执行")
     try:
-        os.popen("sslocal -c "+json_path+"/dtplayer.json")
+        #print "main {}".format(os.getpid())
+        q=Queue()
+        p_ss=Process(target=ss_start,args=(q,))
+        p_is=Process(target=is_connected,args=(q,))
+        p_ss.start()
+        p_is.start()
+       # p_ss.join()#这个是用来等待子进程结束后回收子进程的
+     
+        #p_is.join()
     except Exception,e:  
         print Exception,":",e
        

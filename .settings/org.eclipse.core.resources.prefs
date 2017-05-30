@@ -2,5 +2,3 @@ eclipse.preferences.version=1
 encoding/getInfo.py=utf-8
 encoding/isConected.py=utf-8
 encoding/main.py=utf-8
-encoding/multithread_test.py=utf-8
-encoding/urllib2_proxy_test.py=utf-8

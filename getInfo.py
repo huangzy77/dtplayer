@@ -8,7 +8,7 @@ from bs4.builder import HTML
 def getHtml(url):#爬取html
     try:
         req=urllib2.Request(url)
-        req.add_header('Referer', 'https://www.shadowsocksgo.com/page/testss.html')
+        req.add_header('Referer', 'https://www.kejiss.com/page/testss.html')
         req.add_header('User-Agent',"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36")
         r=urllib2.urlopen(req)
         html=r.read()
@@ -17,7 +17,7 @@ def getHtml(url):#爬取html
     return html
 
 def getData():#从html中提出账号、密码等信息
-    html=getHtml('https://www.shadowsocksgo.com/page/testss.html')
+    html=getHtml('https://www.kejiss.com/page/testss.html')
     soup=BeautifulSoup(html,"html.parser")
    #获取ＩＰ和加密方式
     info_tag0=soup.select('div[class="testvpnitem"]')[0]
