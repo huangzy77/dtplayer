@@ -4,6 +4,7 @@ import urllib2
 import json 
 from bs4 import BeautifulSoup
 from bs4.builder import HTML
+from time import sleep
 
 def getHtml(url):#爬取html
     try:
@@ -13,6 +14,7 @@ def getHtml(url):#爬取html
         r=urllib2.urlopen(req)
         html=r.read()
     except:
+        sleep(20)
         return(getHtml(url))
     return html
 
@@ -37,9 +39,9 @@ def getData():#从html中提出账号、密码等信息
     psw_str0=str(info_tag0)[psw_index0+9:psw_index0+15]#第一个账号的密码
     psw_str1=str(info_tag1)[psw_index1+9:psw_index1+15]#第二个账号的密码
     #print ip_str0,ip_str1,encrypt_str0,encrypt_str1,port_str0,port_str1,psw_str0,psw_str1
-    data_dic0={"server":ip_str0,"server_port":port_str0,"local_address":"127.0.0.1","local_port":1080,"password":psw_str0,"timeout":300,\
+    data_dic0={"server":ip_str0,"server_port":int(port_str0),"local_address":"127.0.0.1","local_port":1080,"password":psw_str0,"timeout":300,\
                "method":encrypt_str0,"fast_open":'true',"workers":5}
-    data_dic1={"server":ip_str1,"server_port":port_str1,"local_address":"127.0.0.1","local_port":1080,"password":psw_str1,"timeout":300,\
+    data_dic1={"server":ip_str1,"server_port":int(port_str1),"local_address":"127.0.0.1","local_port":1080,"password":psw_str1,"timeout":300,\
                "method":encrypt_str1,"fast_open":'true',"workers":5}
     return data_dic0,data_dic1
 
